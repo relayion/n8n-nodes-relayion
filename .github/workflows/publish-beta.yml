@@ -43,9 +43,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
       - name: Publish beta
+        # --ignore-scripts bypasses the prepublishOnly hook (n8n-node prerelease) which
+        # blocks direct npm publish calls and requires npm run release. Lint and build
+        # run explicitly above so nothing is skipped.
         run: |
           [ -n "$NPM_TOKEN" ] && npm config set //registry.npmjs.org/:_authToken "$NPM_TOKEN"
-          npm publish --tag beta --provenance
+          npm publish --tag beta --provenance --ignore-scripts
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
