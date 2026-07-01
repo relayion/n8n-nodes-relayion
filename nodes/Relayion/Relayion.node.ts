@@ -125,10 +125,16 @@ export class Relayion implements INodeType {
 			try {
 				if (resource === 'outbound') {
 					if (operation === 'send') {
+						const options = this.getNodeParameter('options', i, {}) as {
+							deviceId?: string;
+							simSlotIndex?: number;
+						};
 						const body: IDataObject = {
 							recipientNumber: this.getNodeParameter('recipientNumber', i) as string,
 							body: this.getNodeParameter('body', i) as string,
 						};
+						if (options.deviceId) body.deviceId = options.deviceId;
+						if (options.simSlotIndex !== undefined) body.simSlotIndex = options.simSlotIndex;
 						const response = await relayionApiRequest.call(this, 'POST', '/outbound', body);
 						returnData.push({ json: response.data as IDataObject, pairedItem: { item: i } });
 					} else if (operation === 'get') {
