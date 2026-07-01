@@ -1,5 +1,5 @@
 # n8n-nodes-relayion — Spec
-Version: 1.0
+Version: 1.1
 Date: 2026-06-25
 Author: Raffy
 
@@ -8,6 +8,7 @@ Author: Raffy
 | Version | Date | Summary |
 |---|---|---|
 | 1.0 | 2026-06-25 | Initial spec |
+| 1.1 | 2026-07-01 | Add optional device routing on outbound send; add beta release process |
 
 ---
 
@@ -31,7 +32,7 @@ Executes API calls against the Relayion SMS Gateway. Uses the `execute()` patter
 
 | Resource | Operation | Method | Endpoint |
 |---|---|---|---|
-| Outbound Message | Send | POST | `/api/v1/outbound` |
+| Outbound Message | Send | POST | `/api/v1/outbound` (optional: `deviceId`, `simSlotIndex`) |
 | Outbound Message | Get | GET | `/api/v1/outbound/:id` |
 | Outbound Message | List | GET | `/api/v1/outbound` |
 | Inbound Message | Get | GET | `/api/v1/inbound/:id` |
@@ -91,10 +92,21 @@ nodes/Relayion/
 
 Releases go through GitHub Actions only. Local `npm publish` is blocked by the `prepublishOnly` hook and n8n's provenance requirement (enforced since May 1 2026).
 
-Release flow:
+### Stable release
+
 1. Run `npm run release` locally — lints, builds, prompts for version bump, commits, tags, and pushes
 2. The tag push triggers `.github/workflows/publish.yml`
 3. GitHub Actions builds the package and publishes to npm with provenance attestation
+4. n8n detects the new `latest` version and queues a re-review
+
+### Beta release
+
+Used to test in a containerized n8n without triggering n8n's re-review queue.
+
+1. Set version in `package.json` to a pre-release identifier (e.g. `0.1.7-beta.1`) and push the branch
+2. Go to GitHub → Actions → **Publish Beta** → Run workflow → select the branch
+3. Package lands on npm under the `beta` dist-tag — install via n8n community nodes panel using `n8n-nodes-relayion@beta`
+4. When satisfied, set version back to the stable number (e.g. `0.1.7`) and run `npm run release`
 
 ---
 

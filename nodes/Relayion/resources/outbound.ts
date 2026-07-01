@@ -57,6 +57,34 @@ export const outboundFields: INodeProperties[] = [
 		displayOptions: { show: { ...show, operation: ['send'] } },
 	},
 
+	// ── send options ─────────────────────────────────────────────────────────
+	{
+		displayName: 'Options',
+		name: 'options',
+		type: 'collection',
+		placeholder: 'Add Option',
+		default: {},
+		displayOptions: { show: { ...show, operation: ['send'] } },
+		options: [
+			{
+				displayName: 'Device ID',
+				name: 'deviceId',
+				type: 'string',
+				default: '',
+				placeholder: 'e.g. b1c2d3e4-...',
+				description: 'Route this message through a specific authorized device. Leave blank to use the API key\'s default device.',
+			},
+			{
+				displayName: 'SIM Slot Index',
+				name: 'simSlotIndex',
+				type: 'number',
+				typeOptions: { minValue: 0, maxValue: 1 },
+				default: 0,
+				description: 'SIM slot to send from on the resolved device (0 or 1). Only relevant if the device has multiple SIMs.',
+			},
+		],
+	},
+
 	// ── get ──────────────────────────────────────────────────────────────────
 	{
 		displayName: 'Message',
