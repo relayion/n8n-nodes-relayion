@@ -65,6 +65,8 @@ jobs:
   publish:
     name: Publish to npm
     runs-on: ubuntu-latest
+    # Skip pre-release tags (e.g. 0.1.7-beta.1) — those go through publish-beta.yml instead.
+    if: ${{ !contains(github.ref, '-') }}
 
     permissions:
       # Required to mint an OIDC token for npm provenance attestation.

@@ -1,0 +1,51 @@
+# Publishes a beta release to npm under the `beta` dist-tag.
+#
+# This workflow is triggered manually from the GitHub Actions UI.
+# It does NOT update the `latest` tag, so n8n's verified-node monitoring
+# will not pick it up and no re-review is triggered.
+#
+# ─── USAGE ─────────────────────────────────────────────────────────────────────
+#
+# 1. Bump the version in package.json to a pre-release identifier,
+#    e.g. 0.1.7-beta.1, and push to your feature branch.
+# 2. Go to GitHub → Actions → "Publish Beta" → Run workflow → select the branch.
+# 3. The package lands on npm as n8n-nodes-relayion@beta.
+# 4. Install in your n8n container:
+#      npm install n8n-nodes-relayion@beta
+#
+# When satisfied, run `npm run release` locally to publish the stable version
+# to `latest` via the normal publish.yml workflow.
+
+name: Publish Beta
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish-beta:
+    name: Publish beta to npm
+    runs-on: ubuntu-latest
+
+    permissions:
+      # Required to mint an OIDC token for npm provenance attestation.
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Publish beta
+        run: |
+          [ -n "$NPM_TOKEN" ] && npm config set //registry.npmjs.org/:_authToken "$NPM_TOKEN"
+          npm publish --tag beta --provenance
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
